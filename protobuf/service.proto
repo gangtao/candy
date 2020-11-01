@@ -4,8 +4,11 @@ option go_package = "github.com/gangtao/candy/protobuf";
 
 
 service Configuration {
-    rpc GetConfig(GetConfigRequest) returns (GetConfigResponse) {}
+    rpc GetConfig(GetConfigRequest) returns (ConfigItem) {}
+
     rpc PublishConfig(PublishConfigRequest) returns (PublishConfigResponse) {}
+
+    rpc MonitorConfig(GetConfigRequest) returns (stream ConfigItem) {}
 }
 
 message GetConfigRequest {
@@ -19,7 +22,7 @@ message GetConfigRequest {
     int32 timeout = 3;
 }
 
-message GetConfigResponse {
+message ConfigItem {
     // The content of the configuration.
     string content = 1;
 }

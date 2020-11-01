@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"time"
+	"io"
 
 	"google.golang.org/grpc"
 	pb "github.com/gangtao/candy/protobuf"
@@ -45,4 +46,23 @@ func main() {
 		log.Fatalf("could not get config: %v", err)
 	}
 	log.Printf("Greeting: %s", gr.GetContent())
+
+	// Monitor Config
+	req := &pb.GetConfigRequest{ DataId: name, Group:"defaultgroup", Timeout:1000 } 
+	stream, err := c.MonitorConfig(context.Background(), req)
+	if err != nil {
+		log.Fatalf("could not monitor config: %v", err)
+	}
+
+	for {
+		config, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("%v.MonitorConfig(_) = _, %v", c, err)
+		}
+
+		log.Println(config.GetContent())
+	}
 }
