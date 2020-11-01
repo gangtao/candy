@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net"
@@ -11,20 +10,13 @@ import (
 
 	pb "github.com/gangtao/candy/protobuf"
 	"google.golang.org/grpc"
+
+	"github.com/gangtao/candy/config"
 )
 
 const (
 	port = ":50051"
 )
-
-type server struct {
-	pb.UnimplementedConfigurationServer
-}
-
-func (s *server) GetConfig(ctx context.Context, in *pb.GetConfigRequest) (*pb.GetConfigResponse, error) {
-	log.Printf("Received: %v", in.GetDataId())
-	return &pb.GetConfigResponse{Content: "Hello " + in.GetDataId()}, nil
-}
 
 func main() {
 	fmt.Println(quote.Go())
@@ -35,7 +27,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterConfigurationServer(s, &server{})
+	pb.RegisterConfigurationServer(s, &config.Server{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

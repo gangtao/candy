@@ -5,6 +5,7 @@ option go_package = "github.com/gangtao/candy/protobuf";
 
 service Configuration {
     rpc GetConfig(GetConfigRequest) returns (GetConfigResponse) {}
+    rpc PublishConfig(PublishConfigRequest) returns (PublishConfigResponse) {}
 }
 
 message GetConfigRequest {
@@ -21,4 +22,20 @@ message GetConfigRequest {
 message GetConfigResponse {
     // The content of the configuration.
     string content = 1;
+}
+
+message PublishConfigRequest {
+    // The configuration id or key.
+    string dataId = 1;
+
+    // The point where the feature is detected.
+    string group = 2;
+
+    // Content of the config.
+    string content = 3;
+}
+
+message PublishConfigResponse {
+    // The result of configuration publish
+    bool result = 1;
 }

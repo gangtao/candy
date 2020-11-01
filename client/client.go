@@ -31,9 +31,18 @@ func main() {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.GetConfig(ctx, &pb.GetConfigRequest{DataId: name, Group:"defaultgroup", Timeout:1000})
+
+	// Publish Config
+	pr, err := c.PublishConfig(ctx, &pb.PublishConfigRequest{DataId: name, Group:"defaultgroup", Content:"test content"})
+	if err != nil {
+		log.Fatalf("could not publish config: %v", err)
+	}
+	log.Printf("Greeting: %s", pr.GetResult())
+
+	// Get Config
+	gr, err := c.GetConfig(ctx, &pb.GetConfigRequest{DataId: name, Group:"defaultgroup", Timeout:1000})
 	if err != nil {
 		log.Fatalf("could not get config: %v", err)
 	}
-	log.Printf("Greeting: %s", r.GetContent())
+	log.Printf("Greeting: %s", gr.GetContent())
 }
