@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option go_package = "github.com/gangtao/candy/protobuf";
+
+
+service Configuration {
+    rpc GetConfig(GetConfigRequest) returns (GetConfigResponse) {}
+}
+
+message GetConfigRequest {
+    // The configuration id or key.
+    string dataId = 1;
+
+    // The point where the feature is detected.
+    string group = 2;
+
+    // Timeout.
+    int32 timeout = 3;
+}
+
+message GetConfigResponse {
+    // The content of the configuration.
+    string content = 1;
+}

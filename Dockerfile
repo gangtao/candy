@@ -4,6 +4,7 @@ LABEL author="gang.tao@outlook.com"
 RUN mkdir /home/candy
 WORKDIR /home/candy
 
-COPY ./candy /home/candy/
+COPY ./server/server /home/candy/
+COPY ./client/client /home/candy/
 
-ENTRYPOINT ["/home/candy/candy"]
+ENTRYPOINT ["/home/candy/server"]
