@@ -234,7 +234,7 @@ func ZKWatchPathTest() {
 }
 
 func main() {
-	//ZKOperateTest()
+	ZKOperateTest()
 	//ZKOperateWatchTest()
-	ZKWatchPathTest()
+	//ZKWatchPathTest()
 }

@@ -13,7 +13,8 @@ import (
 
 const (
 	address     = "localhost:50051"
-	defaultName = "world"
+	defaultName = "world.is.here"
+	defaultGroup = "default::group"
 )
 
 func main() {
@@ -34,14 +35,14 @@ func main() {
 	defer cancel()
 
 	// Publish Config
-	pr, err := c.PublishConfig(ctx, &pb.PublishConfigRequest{DataId: name, Group:"defaultgroup", Content:"test content"})
+	pr, err := c.PublishConfig(ctx, &pb.PublishConfigRequest{DataId: name, Group:defaultGroup, Content:"test.content"})
 	if err != nil {
 		log.Fatalf("could not publish config: %v", err)
 	}
 	log.Printf("Greeting: %s", pr.GetResult())
 
 	// Get Config
-	gr, err := c.GetConfig(ctx, &pb.GetConfigRequest{DataId: name, Group:"defaultgroup", Timeout:1000})
+	gr, err := c.GetConfig(ctx, &pb.GetConfigRequest{DataId: name, Group:defaultGroup, Timeout:1000})
 	if err != nil {
 		log.Fatalf("could not get config: %v", err)
 	}
