@@ -211,14 +211,15 @@ func ZKWatchPathTest() {
         return
     }
 	fmt.Printf("ch_path: %s create\n", p)
-	
+    
+    /*
 	for {
         _, _, ch, _ := conn.GetW(ch_path)
         e := <-ch
 		fmt.Println("GetW('"+ch_path+"'):", e.Type, "Event:", e)
 
 		if e.Type == zk.EventNodeDataChanged {
-			fmt.Printf("has node[%d] data changed\n", e.Path)
+			fmt.Printf("has node[%s] data changed\n", e.Path)
 			fmt.Printf("%+v\n", e)
 			v, _, err := conn.Get(ch_path)
 			if err != nil {
@@ -230,11 +231,32 @@ func ZKWatchPathTest() {
 		}
 
 		time.Sleep(time.Millisecond * 10)
+    }
+    */
+
+    for  {
+        _, _, ch, _ := conn.GetW(ch_path)
+		select {
+		case e := <-ch:
+			if e.Err == nil {
+				if e.Type == zk.EventNodeDataChanged {
+                    fmt.Printf("has node[%s] data changed\n", e.Path)
+                    fmt.Printf("%+v\n", e)
+                    v, _, err := conn.Get(ch_path)
+                    if err != nil {
+                        fmt.Println(err)
+                        return
+                    }
+        
+                    fmt.Printf("value of path[%s]=[%s].\n", ch_path, v)
+                }
+			}
+        }
 	}
 }
 
 func main() {
-	ZKOperateTest()
+	//ZKOperateTest()
 	//ZKOperateWatchTest()
-	//ZKWatchPathTest()
+	ZKWatchPathTest()
 }

@@ -13,6 +13,16 @@ type ConfigEvent struct {
 
 type ConfigEventCallback func(ConfigEvent)
 
+func initEventCallback(stream pb.Configuration_MonitorConfigServer) ConfigEventCallback {
+	return func(event ConfigEvent) {
+        item := pb.ConfigItem{Content: event.Content}
+		if err := stream.Send(&item); err != nil {
+			log.Printf("Error : something terrible happen -> %s", err)
+		}
+    }
+
+}
+
 type KVStore interface {
 	GetConfig(dataId string, group string) (string, error)
 	PublishConfig(dataId string, group string, content string) error
@@ -47,6 +57,10 @@ func (s *Server) PublishConfig(ctx context.Context, in *pb.PublishConfigRequest)
 }
 
 func (s *Server) MonitorConfig(in *pb.GetConfigRequest, stream pb.Configuration_MonitorConfigServer) error {
+	log.Printf("Received: %v %v %v", in.GetDataId(), in.GetGroup(), in.GetTimeout())
+
+
+	
 	item := pb.ConfigItem{Content: "test content"}
 	if err := stream.Send(&item); err != nil {
     	return err

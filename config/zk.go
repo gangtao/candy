@@ -25,7 +25,7 @@ func (c *zkClient) GetConfig(dataId string, group string) (string, error) {
 
 	conn, _, err := zk.Connect(c.servers, c.sessionTimeout)
     if err != nil {
-        log.Printf("Error : something terrible happen -> ", err)
+        log.Printf("Error : something terrible happen -> %s ", err)
         return "", err
     }
 	defer conn.Close()
@@ -33,7 +33,7 @@ func (c *zkClient) GetConfig(dataId string, group string) (string, error) {
 	var itemPath = fmt.Sprintf("/%s/%s", group, dataId)
 	v, _, err := conn.Get(itemPath)
     if err != nil {
-        log.Printf("Error : something terrible happen -> ", err)
+        log.Printf("Error : something terrible happen -> %s ", err)
         return "", err
     }
 
@@ -47,7 +47,7 @@ func (c *zkClient) PublishConfig(dataId string, group string, content string) er
 
 	conn, _, err := zk.Connect(c.servers, c.sessionTimeout)
     if err != nil {
-        log.Printf("Error : something terrible happen -> ", err)
+        log.Printf("Error : something terrible happen -> %s", err)
         return err
     }
 	defer conn.Close()
@@ -55,7 +55,7 @@ func (c *zkClient) PublishConfig(dataId string, group string, content string) er
 	rootPath := fmt.Sprintf("/%s", group)
 	exist, _, err := conn.Exists(rootPath)
     if err != nil {
-        log.Printf("Error : something terrible happen -> ", err)
+        log.Printf("Error : something terrible happen -> %s", err)
         return err
 	}
 
@@ -67,7 +67,7 @@ func (c *zkClient) PublishConfig(dataId string, group string, content string) er
 		
 		p, err_create := conn.Create(rootPath, rootData, flags, acls)
 		if err_create != nil {
-			log.Printf("Error : something terrible happen -> ", err_create)
+			log.Printf("Error : something terrible happen -> %s", err_create)
 			return err_create
 		}
 		log.Printf("root node created: %s", p)
@@ -76,7 +76,7 @@ func (c *zkClient) PublishConfig(dataId string, group string, content string) er
 	var itemPath = fmt.Sprintf("/%s/%s", group, dataId)
 	p, err_create := conn.Create(itemPath, []byte(content), flags, acls)
 	if err_create != nil {
-		log.Printf("Error : something terrible happen -> ", err_create)
+		log.Printf("Error : something terrible happen -> %s", err_create)
 		return err_create
 	}
 	log.Printf("item node created: %s", p)
@@ -89,10 +89,32 @@ func (c *zkClient) MonitorConfig(dataId string, group string, callback ConfigEve
 
 	conn, _, err := zk.Connect(c.servers, c.sessionTimeout)
     if err != nil {
-        log.Printf("Error : something terrible happen -> ", err)
+        log.Printf("Error : something terrible happen -> %s", err)
         return err
     }
 	defer conn.Close()
+
+	var itemPath = fmt.Sprintf("/%s/%s", group, dataId)
+
+	for  {
+        _, _, ch, _ := conn.GetW(itemPath)
+		select {
+		case e := <-ch:
+			if e.Err == nil {
+				if e.Type == zk.EventNodeDataChanged {
+                    log.Printf("has node[%s] data changed\n", e.Path)
+                    log.Printf("%+v\n", e)
+                    v, _, err := conn.Get(itemPath)
+                    if err != nil {
+                        fmt.Println(err)
+                        return
+                    }
+        
+                    fmt.Printf("value of path[%s]=[%s].\n", ch_path, v)
+                }
+			}
+        }
+	}
 	
 	return nil
 }
