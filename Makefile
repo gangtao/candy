@@ -30,11 +30,4 @@ docker: Dockerfile build gen
 
 push:
 	docker tag $(IMAGE_NAME) ${FULLNAME}
-	docker push ${FULLNAME}docker run -it --name etcd bitnami/etcd
-
-backend:
-	docker run -d \
-    	--publish 3000:2379 \
-    	--publish 3001:2380 \
-    	--env ALLOW_NONE_AUTHENTICATION=yes \
-    	bitnami/etcd
+	docker push ${FULLNAME}
