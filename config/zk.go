@@ -5,6 +5,7 @@ import (
 	"time"
 	"fmt"
 	"errors"
+	"os"
 
 	"github.com/samuel/go-zookeeper/zk"
 )
@@ -15,7 +16,16 @@ type zkClient struct {
 }
 
 func NewZKStore() KVStore {
-	var hosts = []string{"localhost:2181"}
+	zkHost := os.Getenv("ZK_HOST")
+	var hosts []string
+
+	if zkHost != "" {
+		hostPath := fmt.Sprintf("%s:%s", zkHost, "2181")
+		hosts = []string{hostPath}
+	} else {
+		hosts = []string{"localhost:2181"}
+	}
+	
 	var timeout = time.Second*5
 
 	return &zkClient{hosts, timeout}

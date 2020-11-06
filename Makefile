@@ -25,7 +25,7 @@ build:
 	cd ./server ; env GOOS=linux GOARCH=amd64 go build
 	cd ./client ; env GOOS=linux GOARCH=amd64 go build
 
-docker: Dockerfile build
+docker: Dockerfile build gen
 	docker build -t $(IMAGE_NAME) .
 
 push:

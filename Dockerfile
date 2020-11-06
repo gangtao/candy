@@ -7,4 +7,6 @@ WORKDIR /home/candy
 COPY ./server/server /home/candy/
 COPY ./client/client /home/candy/
 
+EXPOSE 50051
+
 ENTRYPOINT ["/home/candy/server"]
