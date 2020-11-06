@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 	"fmt"
+	"errors"
 
 	"github.com/samuel/go-zookeeper/zk"
 )
@@ -107,14 +108,47 @@ func (c *zkClient) MonitorConfig(dataId string, group string, callback ConfigEve
                     v, _, err := conn.Get(itemPath)
                     if err != nil {
                         fmt.Println(err)
-                        return
+                        return err
                     }
         
-                    fmt.Printf("value of path[%s]=[%s].\n", ch_path, v)
+					fmt.Printf("value of path[%s]=[%s].\n", itemPath, v)
+					evt := &ConfigEvent{Content:string(v)}
+					callback(evt)
                 }
 			}
         }
 	}
+}
+
+func (c *zkClient) DeleteConfig(dataId string, group string) error {
+	log.Printf("DeleteConfig for dataId [%s] group [%s]", dataId, group)
+
+	conn, _, err := zk.Connect(c.servers, c.sessionTimeout)
+    if err != nil {
+        log.Printf("Error : something terrible happen -> %s", err)
+        return err
+    }
+	defer conn.Close()
+
+	var itemPath = fmt.Sprintf("/%s/%s", group, dataId)
+
+	// check exist
+    exist, s, err := conn.Exists(itemPath)
+    if err != nil {
+        log.Printf("Error : something terrible happen -> %s", err)
+        return err
+	}
+
+	if !exist {
+		log.Printf("Error : input config %s does not exist", itemPath)
+        return errors.New("config item does not exist")
+	}
 	
+	// delete
+    err = conn.Delete(itemPath, s.Version)
+    if err != nil {
+        log.Printf("Error : something terrible happen -> %s", err)
+        return err
+    }
 	return nil
 }

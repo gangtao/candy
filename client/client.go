@@ -39,17 +39,33 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not publish config: %v", err)
 	}
-	log.Printf("Greeting: %s", pr.GetResult())
+	log.Printf("PublishConfig: %s", pr.GetResult())
+
+	//Delete Config
+	dr, err := c.DeletesConfig(ctx, &pb.ConfigRequest{DataId: name, Group:defaultGroup , Timeout:1000})
+	if err != nil {
+		log.Fatalf("could not delete config: %v", err)
+	}
+	log.Printf("DeletesConfig: %s", dr.GetResult())
+
+
+	// Publish Config again
+	pr, err = c.PublishConfig(ctx, &pb.PublishConfigRequest{DataId: name, Group:defaultGroup, Content:"test.content"})
+	if err != nil {
+		log.Fatalf("could not publish config: %v", err)
+	}
+	log.Printf("PublishConfig: %s", pr.GetResult())
+
 
 	// Get Config
-	gr, err := c.GetConfig(ctx, &pb.GetConfigRequest{DataId: name, Group:defaultGroup, Timeout:1000})
+	gr, err := c.GetConfig(ctx, &pb.ConfigRequest{DataId: name, Group:defaultGroup, Timeout:1000})
 	if err != nil {
 		log.Fatalf("could not get config: %v", err)
 	}
 	log.Printf("Greeting: %s", gr.GetContent())
 
 	// Monitor Config
-	req := &pb.GetConfigRequest{ DataId: name, Group:"defaultgroup", Timeout:1000 } 
+	req := &pb.ConfigRequest{ DataId: name, Group:defaultGroup, Timeout:1000 } 
 	stream, err := c.MonitorConfig(context.Background(), req)
 	if err != nil {
 		log.Fatalf("could not monitor config: %v", err)
@@ -64,6 +80,6 @@ func main() {
 			log.Fatalf("%v.MonitorConfig(_) = _, %v", c, err)
 		}
 
-		log.Println(config.GetContent())
+		log.Printf("find config change %s", config.GetContent())
 	}
 }

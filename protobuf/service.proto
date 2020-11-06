@@ -4,14 +4,13 @@ option go_package = "github.com/gangtao/candy/protobuf";
 
 
 service Configuration {
-    rpc GetConfig(GetConfigRequest) returns (ConfigItem) {}
-
+    rpc GetConfig(ConfigRequest) returns (ConfigItem) {}
     rpc PublishConfig(PublishConfigRequest) returns (PublishConfigResponse) {}
-
-    rpc MonitorConfig(GetConfigRequest) returns (stream ConfigItem) {}
+    rpc DeletesConfig(ConfigRequest) returns (DeleteConfigResponse) {}
+    rpc MonitorConfig(ConfigRequest) returns (stream ConfigItem) {}
 }
 
-message GetConfigRequest {
+message ConfigRequest {
     // The configuration id or key.
     string dataId = 1;
 
@@ -40,5 +39,10 @@ message PublishConfigRequest {
 
 message PublishConfigResponse {
     // The result of configuration publish
+    bool result = 1;
+}
+
+message DeleteConfigResponse {
+    // The result of configuration deletion
     bool result = 1;
 }

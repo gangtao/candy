@@ -12,7 +12,7 @@ install:
 	go get github.com/golang/protobuf/protoc-gen-go \
          google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	go get -u google.golang.org/grpc
-	export PATH="$PATH:$(go env GOPATH)/bin"
+	#export PATH="$PATH:$(go env GOPATH)/bin"
 
 gen:
 	protoc --go_out=. --go_opt=paths=source_relative \
